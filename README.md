@@ -13,5 +13,5 @@ parcel src/index.html
 # 打包发布
 
 ```
-parcel build src/index.html --public-url '默认路径'
+yarn build
 ```
