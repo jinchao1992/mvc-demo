@@ -48,6 +48,8 @@ body > .wrap > section {
   margin-left: 10vw;
   background-color: aqua;
   transition: transform .5s;
+  border-radius: 12px;
+  cursor: pointer;
 }
 #app3 .active {
   transform: translate(15vw);
@@ -58,8 +60,8 @@ body > .wrap > section {
   align-items: center;
 }
 #app4 .circular {
-  width: 30vw;
-  height: 30vw;
+  width: 30vh;
+  height: 30vh;
   border-radius: 50%;
   border: 1px solid #ddd;
   cursor: pointer;
@@ -80,4 +82,4 @@ body > .wrap > section {
   animation: change 3s infinite alternate linear;
 }
 
-/*# sourceMappingURL=main.5a2fe586.css.map */
+/*# sourceMappingURL=main.ec3a53ab.css.map */

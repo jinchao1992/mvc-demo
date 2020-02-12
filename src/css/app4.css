@@ -4,8 +4,8 @@
   align-items: center;
 }
 #app4 .circular {
-  width: 30vw;
-  height: 30vw;
+  width: 30vh;
+  height: 30vh;
   border-radius: 50%;
   border: 1px solid #ddd;
   cursor: pointer;

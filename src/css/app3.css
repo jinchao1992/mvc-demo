@@ -6,6 +6,8 @@
   margin-left: 10vw;
   background-color: aqua;
   transition: transform .5s;
+  border-radius: 12px;
+  cursor: pointer;
 }
 #app3 .active {
   transform: translate(15vw);
