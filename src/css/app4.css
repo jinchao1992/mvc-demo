@@ -1,0 +1,27 @@
+#app4 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#app4 .circular {
+  width: 30vw;
+  height: 30vw;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  background-color: aquamarine;
+}
+@keyframes change {
+  0% {
+    background-color: aquamarine;
+  }
+  50% {
+    background-color: bisque;
+  }
+  100% {
+    background-color: cornflowerblue;
+  }
+}
+#app4 .circular.active {
+  animation: change 3s infinite alternate linear;
+}

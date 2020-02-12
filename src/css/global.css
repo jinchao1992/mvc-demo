@@ -1,0 +1,9 @@
+body > .wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+body > .wrap > section {
+  width: 50vw;
+  height: 50vh;
+  border: 1px solid #ddd;
+}
