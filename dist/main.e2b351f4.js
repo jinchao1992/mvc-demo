@@ -10934,6 +10934,11 @@ return jQuery;
 },{"process":"sfur"}],"Rdxg":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
 require("./../css/app1.css");
 
 var _jquery = _interopRequireDefault(require("jquery"));
@@ -10941,39 +10946,100 @@ var _jquery = _interopRequireDefault(require("jquery"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // 引入JQuery
-var $button1 = (0, _jquery.default)('#add');
-var $button2 = (0, _jquery.default)('#subtract');
-var $button3 = (0, _jquery.default)('#multiply');
-var $button4 = (0, _jquery.default)('#divide');
-var $number = (0, _jquery.default)('#number');
-var n = localStorage.getItem('n');
-$number.text(n || 100);
-$button1.on('click', function () {
-  var n = parseInt($number.text());
-  n += 1;
-  $number.text(n);
-  localStorage.setItem('n', n);
-});
-$button2.on('click', function () {
-  var n = parseInt($number.text());
-  n -= 1;
-  $number.text(n);
-  localStorage.setItem('n', n);
-});
-$button3.on('click', function () {
-  var n = parseInt($number.text());
-  n *= 2;
-  $number.text(n);
-  localStorage.setItem('n', n);
-});
-$button4.on('click', function () {
-  var n = parseInt($number.text());
-  n *= 3;
-  $number.text(n);
-  localStorage.setItem('n', n);
-});
+var eventBus = (0, _jquery.default)(window);
+/**
+ * eventBus 
+ * on 方法定义事件
+ * trigger 触发事件
+ */
+// 数据相关的放到 M
+
+var m = {
+  data: {
+    n: parseInt(localStorage.getItem('n'))
+  },
+  create: function create() {},
+  update: function update(data) {
+    Object.assign(m.data, data); // 更新data里的数据
+
+    eventBus.trigger('m:updated');
+    localStorage.setItem('n', m.data.n);
+  },
+  delete: function _delete() {},
+  get: function get() {}
+}; // 视图相关的放到 V
+
+var v = {
+  el: null,
+  html: "\n    <div>\n      <div class=\"output\">\n        <span id=\"number\">{{n}}</span>\n      </div>\n      <div class=\"actives\">\n        <button id=\"add\">+1</button>\n        <button id=\"subtract\">-1</button>\n        <button id=\"multiply\">*2</button>\n        <button id=\"divide\">\xF72</button>\n      </div>\n    </div>\n  ",
+  init: function init(container) {
+    v.el = (0, _jquery.default)(container);
+  },
+  render: function render(n) {
+    if (v.el.children.length !== 0) {
+      v.el.empty();
+    }
+
+    (0, _jquery.default)(v.html.replace('{{n}}', n)).appendTo(v.el);
+  }
+}; // 其他放到 C
+
+var c = {
+  init: function init(container) {
+    // el 的作用是用户需要传入的容器
+    v.init(container);
+    v.render(m.data.n);
+    c.autoBindEvents();
+    eventBus.on('m:updated', function () {
+      v.render(m.data.n);
+    });
+  },
+  events: {
+    'click #add': 'add',
+    'click #subtract': 'subtract',
+    'click #multiply': 'multiply',
+    'click #divide': 'divide'
+  },
+  add: function add() {
+    m.update({
+      n: m.data.n + 1
+    });
+  },
+  subtract: function subtract() {
+    m.update({
+      n: m.data.n - 1
+    });
+  },
+  multiply: function multiply() {
+    m.update({
+      n: m.data.n * 2
+    });
+  },
+  divide: function divide() {
+    m.update({
+      n: m.data.n / 2
+    });
+  },
+  autoBindEvents: function autoBindEvents() {
+    for (var key in c.events) {
+      var value = c.events[key];
+      var spaceIndex = key.indexOf(' ');
+      var part1 = key.slice(0, spaceIndex);
+      var part2 = key.slice(spaceIndex + 1);
+      v.el.on(part1, part2, c[value]);
+    }
+  }
+}; // 初始化调用
+
+var _default = c;
+exports.default = _default;
 },{"./../css/app1.css":"AEyn","jquery":"juYr"}],"QsWc":[function(require,module,exports) {
 "use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
 require("./../css/app2.css");
 
@@ -10981,18 +11047,72 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var $tabBar = (0, _jquery.default)('#app2 .tab-bar');
-var $tabContent = (0, _jquery.default)('#app2 .tab-content');
-var localKey = 'app2.index';
-var index = localStorage.getItem(localKey) || 0;
-$tabBar.on('click', 'li', function (e) {
-  var li = e.currentTarget;
-  (0, _jquery.default)(li).addClass('selected').siblings().removeClass('selected');
-  var index = (0, _jquery.default)(li).index();
-  localStorage.setItem(localKey, index);
-  $tabContent.children().eq(index).addClass('active').siblings().removeClass('active');
-});
-$tabBar.children().eq(index).trigger('click');
+var eventBus = (0, _jquery.default)(window);
+var localKey = 'app2.index'; // 数据层m
+
+var m = {
+  data: {
+    index: parseInt(localStorage.getItem(localKey)) || 0
+  },
+  create: function create() {},
+  update: function update(data) {
+    Object.assign(m.data, data); // 更新data里的数据
+
+    eventBus.trigger('m:updated');
+    localStorage.setItem(localKey, m.data.index);
+  },
+  delete: function _delete() {},
+  get: function get() {}
+}; // 视图相关的放到 V
+
+var v = {
+  el: null,
+  html: function html(index) {
+    return "\n      <div>\n        <ol class=\"tab-bar\">\n          <li class=\"".concat(index === 0 ? 'selected' : '', "\" data-index=\"0\">tab1</li>\n          <li class=\"").concat(index === 1 ? 'selected' : '', "\" data-index=\"1\">tab2</li>\n        </ol>\n        <ol class=\"tab-content\">\n          <li class=\"").concat(index === 0 ? 'active' : '', "\">\u5185\u5BB91</li>\n          <li class=\"").concat(index === 1 ? 'active' : '', "\">\u5185\u5BB92</li>\n        </ol>\n      </div>\n    ");
+  },
+  init: function init(container) {
+    v.el = (0, _jquery.default)(container);
+  },
+  render: function render(index) {
+    if (v.el.children.length !== 0) {
+      v.el.empty();
+    }
+
+    (0, _jquery.default)(v.html(index)).appendTo(v.el);
+  }
+}; // 其他放到 C
+
+var c = {
+  init: function init(container) {
+    // el 的作用是用户需要传入的容器
+    v.init(container);
+    v.render(m.data.index);
+    c.autoBindEvents();
+    eventBus.on('m:updated', function () {
+      v.render(m.data.index);
+    });
+  },
+  events: {
+    'click .tab-bar li': 'handleTab'
+  },
+  handleTab: function handleTab(e) {
+    var index = parseInt(e.currentTarget.dataset.index);
+    m.update({
+      index: index
+    });
+  },
+  autoBindEvents: function autoBindEvents() {
+    for (var key in c.events) {
+      var value = c.events[key];
+      var spaceIndex = key.indexOf(' ');
+      var part1 = key.slice(0, spaceIndex);
+      var part2 = key.slice(spaceIndex + 1);
+      v.el.on(part1, part2, c[value]);
+    }
+  }
+};
+var _default = c;
+exports.default = _default;
 },{"./../css/app2.css":"AEyn","jquery":"juYr"}],"CHY8":[function(require,module,exports) {
 "use strict";
 
@@ -11002,15 +11122,12 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var html = "\n  <section id=\"app3\">\n    <div class=\"square\"></div>\n  </section>\n";
+var $element = (0, _jquery.default)(html).appendTo((0, _jquery.default)('body > .wrap'));
 var $app3 = (0, _jquery.default)('#app3');
 var $square = $app3.find('.square');
 var localKey = 'app3.active';
-var active = localStorage.getItem(localKey) === 'yes'; // if(active) {
-//   $square.addClass('active')
-// } else {
-//   $square.removeClass('active')
-// }
-
+var active = localStorage.getItem(localKey) === 'yes';
 $square.toggleClass('active', active);
 $square.on('click', function () {
   if (!$square.hasClass('active')) {
@@ -11030,6 +11147,8 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var html = "\n  <section id=\"app4\">\n    <div class=\"circular\"></div>\n  </section>\n";
+var $element = (0, _jquery.default)(html).appendTo((0, _jquery.default)('body > .wrap'));
 var $circular = (0, _jquery.default)('#app4 .circular');
 $circular.on('mouseenter', function () {
   $circular.addClass('active');
@@ -11043,12 +11162,19 @@ require("./css/reset.css");
 
 require("./css/global.css");
 
-require("./js/app1");
+var _app = _interopRequireDefault(require("./js/app1"));
 
-require("./js/app2");
+var _app2 = _interopRequireDefault(require("./js/app2"));
 
 require("./js/app3");
 
 require("./js/app4");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// 初始化调用
+_app.default.init('#app1');
+
+_app2.default.init('#app2');
 },{"./css/reset.css":"AEyn","./css/global.css":"AEyn","./js/app1":"Rdxg","./js/app2":"QsWc","./js/app3":"CHY8","./js/app4":"qLTF"}]},{},["epB2"], null)
-//# sourceMappingURL=main.da339eab.js.map
+//# sourceMappingURL=main.e2b351f4.js.map
