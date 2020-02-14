@@ -4,8 +4,6 @@ import $ from 'jquery'
 import Model from '../base/Model'
 import View from '../base/View'
 
-const eventBus = $(window)
-
 const localKey = 'app2.index'
 
 // 数据层m
@@ -16,7 +14,7 @@ const m = new Model({
   update(data) {
     Object.assign(m.data, data)
     // 更新data里的数据
-    eventBus.trigger('m:updated')
+    m.trigger('m:updated')
     localStorage.setItem(localKey, m.data.index)
   }
 })
@@ -25,7 +23,6 @@ const init = (el) => {
   new View({
     el,
     data: m.data,
-    eventBus,
     html: (index) => { 
       return `
         <div>

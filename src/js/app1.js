@@ -5,13 +5,6 @@ import Model from '../base/Model.js'
 import View from '../base/View.js'
 
 /**
- * eventBus 
- * on 方法定义事件
- * trigger 触发事件
- */
-const eventBus = $(window)
-
-/**
  *  new Model 是方便把所有公共的属性放入到原先当中，因为 app1 中使用 app2 中也使用
  */
 // 数据相关的放到 M
@@ -22,7 +15,7 @@ const m = new Model({
   update: function(data) {
     Object.assign(m.data, data)
     // 更新data里的数据
-    eventBus.trigger('m:updated')
+    m.trigger('m:updated')
     localStorage.setItem('n', m.data.n)
   }
 })
@@ -30,7 +23,6 @@ const m = new Model({
 const init = (el) => {
   const view = new View({
     data: m.data,
-    eventBus,
     el,
     html: `
       <div>

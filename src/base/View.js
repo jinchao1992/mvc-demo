@@ -1,13 +1,15 @@
 import $ from 'jquery'
+import EventBus from './EventBus'
 
-class View {
+class View extends EventBus{
   constructor(options) {
-    // constructor 是给本身添加属性或者方法
+    super() // super 是柔和EventBus的constructor
+    // constructor 是给本身添加属性或者方法, 也就是初始化属性与方法
     Object.assign(this, options)
     this.el = $(this.el)
     this.render(this.data)
     this.autoBindEvents()
-    this.eventBus.on('m:updated', () => {
+    this.on('m:updated', () => {
       this.render(this.data)
     })
   }
