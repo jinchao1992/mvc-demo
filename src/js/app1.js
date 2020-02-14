@@ -17,7 +17,7 @@ const eventBus = $(window)
 // 数据相关的放到 M
 const m = new Model({
   data: {
-    n: parseInt(localStorage.getItem('n'))
+    n: parseFloat(localStorage.getItem('n'))
   },
   update: function(data) {
     Object.assign(m.data, data)
@@ -27,71 +27,61 @@ const m = new Model({
   }
 })
 
-const view = {
-  el: null,
-  html: `
-    <div>
-      <div class="output">
-        <span id="number">{{n}}</span>
+const init = (el) => {
+  const view = new View({
+    data: m.data,
+    eventBus,
+    el,
+    html: `
+      <div>
+        <div class="output">
+          <span id="number">{{n}}</span>
+        </div>
+        <div class="actives">
+          <button id="add">+1</button>
+          <button id="subtract">-1</button>
+          <button id="multiply">*2</button>
+          <button id="divide">÷2</button>
+        </div>
       </div>
-      <div class="actives">
-        <button id="add">+1</button>
-        <button id="subtract">-1</button>
-        <button id="multiply">*2</button>
-        <button id="divide">÷2</button>
-      </div>
-    </div>
-  `,
-  render(n) {
-    if (view.el.children.length !== 0) {
-      view.el.empty()
+    `,
+    render({
+      n
+    }) {
+      if (this.el.children.length !== 0) {
+        this.el.empty()
+      }
+      $(this.html.replace('{{n}}', n)).appendTo(this.el)
+    },
+    events: {
+      'click #add': 'add',
+      'click #subtract': 'subtract',
+      'click #multiply': 'multiply',
+      'click #divide': 'divide'
+    },
+    add() {
+      m.update({
+        n: m.data.n + 1
+      })
+    },
+    subtract() {
+      m.update({
+        n: m.data.n - 1
+      })
+    },
+    multiply() {
+      m.update({
+        n: m.data.n * 2
+      })
+    },
+    divide() {
+      m.update({
+        n: m.data.n / 2
+      })
     }
-    $(view.html.replace('{{n}}', n)).appendTo(view.el)
-  },
-  init(container) {
-    view.el = $(container)
-    view.render(m.data.n)
-    view.autoBindEvents()
-    eventBus.on('m:updated', () => {
-      view.render(m.data.n)
-    })
-  },
-  events: {
-    'click #add': 'add',
-    'click #subtract': 'subtract',
-    'click #multiply': 'multiply',
-    'click #divide': 'divide'
-  },
-  add() {
-    m.update({
-      n: m.data.n + 1
-    })
-  },
-  subtract() {
-    m.update({
-      n: m.data.n - 1
-    })
-  },
-  multiply() {
-    m.update({
-      n: m.data.n * 2
-    })
-  },
-  divide() {
-    m.update({
-      n: m.data.n / 2
-    })
-  },
-  autoBindEvents() {
-    for (let key in view.events) {
-      const value = view.events[key]
-      const spaceIndex = key.indexOf(' ')
-      const part1 = key.slice(0, spaceIndex)
-      const part2 = key.slice(spaceIndex + 1)
-      view.el.on(part1, part2, view[value])
-    }
-  }
+  })
+  console.dir(view)
 }
 // 初始化调用
-export default view
+export default init
 

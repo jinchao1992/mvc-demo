@@ -11001,17 +11001,44 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var View = function View(_ref) {
-  var el = _ref.el,
-      html = _ref.html,
-      render = _ref.render;
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  _classCallCheck(this, View);
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-  this.el = (0, _jquery.default)(el);
-  this.html = html;
-  this.render = render;
-};
+var View =
+/*#__PURE__*/
+function () {
+  function View(options) {
+    var _this = this;
+
+    _classCallCheck(this, View);
+
+    // constructor 是给本身添加属性或者方法
+    Object.assign(this, options);
+    this.el = (0, _jquery.default)(this.el);
+    this.render(this.data);
+    this.autoBindEvents();
+    this.eventBus.on('m:updated', function () {
+      _this.render(_this.data);
+    });
+  } // 这里的是给原型添加
+
+
+  _createClass(View, [{
+    key: "autoBindEvents",
+    value: function autoBindEvents() {
+      for (var key in this.events) {
+        var value = this.events[key];
+        var spaceIndex = key.indexOf(' ');
+        var part1 = key.slice(0, spaceIndex);
+        var part2 = key.slice(spaceIndex + 1);
+        this.el.on(part1, part2, this[value]);
+      }
+    }
+  }]);
+
+  return View;
+}();
 
 var _default = View;
 exports.default = _default;
@@ -11048,7 +11075,7 @@ var eventBus = (0, _jquery.default)(window);
 
 var m = new _Model.default({
   data: {
-    n: parseInt(localStorage.getItem('n'))
+    n: parseFloat(localStorage.getItem('n'))
   },
   update: function update(data) {
     Object.assign(m.data, data); // 更新data里的数据
@@ -11057,62 +11084,54 @@ var m = new _Model.default({
     localStorage.setItem('n', m.data.n);
   }
 });
-var view = {
-  el: null,
-  html: "\n    <div>\n      <div class=\"output\">\n        <span id=\"number\">{{n}}</span>\n      </div>\n      <div class=\"actives\">\n        <button id=\"add\">+1</button>\n        <button id=\"subtract\">-1</button>\n        <button id=\"multiply\">*2</button>\n        <button id=\"divide\">\xF72</button>\n      </div>\n    </div>\n  ",
-  render: function render(n) {
-    if (view.el.children.length !== 0) {
-      view.el.empty();
-    }
 
-    (0, _jquery.default)(view.html.replace('{{n}}', n)).appendTo(view.el);
-  },
-  init: function init(container) {
-    view.el = (0, _jquery.default)(container);
-    view.render(m.data.n);
-    view.autoBindEvents();
-    eventBus.on('m:updated', function () {
-      view.render(m.data.n);
-    });
-  },
-  events: {
-    'click #add': 'add',
-    'click #subtract': 'subtract',
-    'click #multiply': 'multiply',
-    'click #divide': 'divide'
-  },
-  add: function add() {
-    m.update({
-      n: m.data.n + 1
-    });
-  },
-  subtract: function subtract() {
-    m.update({
-      n: m.data.n - 1
-    });
-  },
-  multiply: function multiply() {
-    m.update({
-      n: m.data.n * 2
-    });
-  },
-  divide: function divide() {
-    m.update({
-      n: m.data.n / 2
-    });
-  },
-  autoBindEvents: function autoBindEvents() {
-    for (var key in view.events) {
-      var value = view.events[key];
-      var spaceIndex = key.indexOf(' ');
-      var part1 = key.slice(0, spaceIndex);
-      var part2 = key.slice(spaceIndex + 1);
-      view.el.on(part1, part2, view[value]);
+var init = function init(el) {
+  var view = new _View.default({
+    data: m.data,
+    eventBus: eventBus,
+    el: el,
+    html: "\n      <div>\n        <div class=\"output\">\n          <span id=\"number\">{{n}}</span>\n        </div>\n        <div class=\"actives\">\n          <button id=\"add\">+1</button>\n          <button id=\"subtract\">-1</button>\n          <button id=\"multiply\">*2</button>\n          <button id=\"divide\">\xF72</button>\n        </div>\n      </div>\n    ",
+    render: function render(_ref) {
+      var n = _ref.n;
+
+      if (this.el.children.length !== 0) {
+        this.el.empty();
+      }
+
+      (0, _jquery.default)(this.html.replace('{{n}}', n)).appendTo(this.el);
+    },
+    events: {
+      'click #add': 'add',
+      'click #subtract': 'subtract',
+      'click #multiply': 'multiply',
+      'click #divide': 'divide'
+    },
+    add: function add() {
+      m.update({
+        n: m.data.n + 1
+      });
+    },
+    subtract: function subtract() {
+      m.update({
+        n: m.data.n - 1
+      });
+    },
+    multiply: function multiply() {
+      m.update({
+        n: m.data.n * 2
+      });
+    },
+    divide: function divide() {
+      m.update({
+        n: m.data.n / 2
+      });
     }
-  }
+  });
+  console.dir(view);
 }; // 初始化调用
 
-var _default = view;
+
+var _default = init;
 exports.default = _default;
 },{"./../css/app1.css":"AEyn","jquery":"juYr","../base/Model.js":"wYwp","../base/View.js":"SFHW"}],"QsWc":[function(require,module,exports) {
 "use strict";
@@ -11127,6 +11146,8 @@ require("./../css/app2.css");
 var _jquery = _interopRequireDefault(require("jquery"));
 
 var _Model = _interopRequireDefault(require("../base/Model"));
+
+var _View = _interopRequireDefault(require("../base/View"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -11143,50 +11164,40 @@ var m = new _Model.default({
     eventBus.trigger('m:updated');
     localStorage.setItem(localKey, m.data.index);
   }
-}); // 其他放到 C
+});
 
-var view = {
-  el: null,
-  html: function html(index) {
-    return "\n      <div>\n        <ol class=\"tab-bar\">\n          <li class=\"".concat(index === 0 ? 'selected' : '', "\" data-index=\"0\">tab1</li>\n          <li class=\"").concat(index === 1 ? 'selected' : '', "\" data-index=\"1\">tab2</li>\n        </ol>\n        <ol class=\"tab-content\">\n          <li class=\"").concat(index === 0 ? 'active' : '', "\">\u5185\u5BB91</li>\n          <li class=\"").concat(index === 1 ? 'active' : '', "\">\u5185\u5BB92</li>\n        </ol>\n      </div>\n    ");
-  },
-  render: function render(index) {
-    if (view.el.children.length !== 0) {
-      view.el.empty();
-    }
+var init = function init(el) {
+  new _View.default({
+    el: el,
+    data: m.data,
+    eventBus: eventBus,
+    html: function html(index) {
+      return "\n        <div>\n          <ol class=\"tab-bar\">\n            <li class=\"".concat(index === 0 ? 'selected' : '', "\" data-index=\"0\">tab1</li>\n            <li class=\"").concat(index === 1 ? 'selected' : '', "\" data-index=\"1\">tab2</li>\n          </ol>\n          <ol class=\"tab-content\">\n            <li class=\"").concat(index === 0 ? 'active' : '', "\">\u5185\u5BB91</li>\n            <li class=\"").concat(index === 1 ? 'active' : '', "\">\u5185\u5BB92</li>\n          </ol>\n        </div>\n      ");
+    },
+    render: function render(_ref) {
+      var index = _ref.index;
 
-    (0, _jquery.default)(view.html(index)).appendTo(view.el);
-  },
-  init: function init(container) {
-    view.el = (0, _jquery.default)(container);
-    view.render(m.data.index);
-    view.autoBindEvents();
-    eventBus.on('m:updated', function () {
-      view.render(m.data.index);
-    });
-  },
-  events: {
-    'click .tab-bar li': 'handleTab'
-  },
-  handleTab: function handleTab(e) {
-    var index = parseInt(e.currentTarget.dataset.index);
-    m.update({
-      index: index
-    });
-  },
-  autoBindEvents: function autoBindEvents() {
-    for (var key in view.events) {
-      var value = view.events[key];
-      var spaceIndex = key.indexOf(' ');
-      var part1 = key.slice(0, spaceIndex);
-      var part2 = key.slice(spaceIndex + 1);
-      view.el.on(part1, part2, view[value]);
+      if (this.el.children.length !== 0) {
+        this.el.empty();
+      }
+
+      (0, _jquery.default)(this.html(index)).appendTo(this.el);
+    },
+    events: {
+      'click .tab-bar li': 'handleTab'
+    },
+    handleTab: function handleTab(e) {
+      var index = parseInt(e.currentTarget.dataset.index);
+      m.update({
+        index: index
+      });
     }
-  }
+  });
 };
-var _default = view;
+
+var _default = init;
 exports.default = _default;
-},{"./../css/app2.css":"AEyn","jquery":"juYr","../base/Model":"wYwp"}],"CHY8":[function(require,module,exports) {
+},{"./../css/app2.css":"AEyn","jquery":"juYr","../base/Model":"wYwp","../base/View":"SFHW"}],"CHY8":[function(require,module,exports) {
 "use strict";
 
 require("./../css/app3.css");
@@ -11246,8 +11257,7 @@ require("./js/app4");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // 初始化调用
-_app.default.init('#app1');
-
-_app2.default.init('#app2');
+(0, _app.default)('#app1');
+(0, _app2.default)('#app2');
 },{"./css/reset.css":"AEyn","./css/global.css":"AEyn","./js/app1":"Rdxg","./js/app2":"QsWc","./js/app3":"CHY8","./js/app4":"qLTF"}]},{},["epB2"], null)
-//# sourceMappingURL=main.fa4b2e30.js.map
+//# sourceMappingURL=main.187d94b3.js.map

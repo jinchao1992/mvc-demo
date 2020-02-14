@@ -8,6 +8,6 @@ import './js/app3'
 import './js/app4'
 
 // 初始化调用
-x.init('#app1')
+x('#app1')
 
-y.init('#app2')
+y('#app2')
