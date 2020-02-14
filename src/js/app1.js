@@ -1,33 +1,33 @@
 import './../css/app1.css'
 // 引入JQuery
 import $ from 'jquery'
-
-const eventBus = $(window)
+import Model from '../base/Model.js'
+import View from '../base/View.js'
 
 /**
  * eventBus 
  * on 方法定义事件
  * trigger 触发事件
  */
+const eventBus = $(window)
 
+/**
+ *  new Model 是方便把所有公共的属性放入到原先当中，因为 app1 中使用 app2 中也使用
+ */
 // 数据相关的放到 M
-const m = {
+const m = new Model({
   data: {
     n: parseInt(localStorage.getItem('n'))
   },
-  create() {},
-  update(data) {
+  update: function(data) {
     Object.assign(m.data, data)
     // 更新data里的数据
     eventBus.trigger('m:updated')
     localStorage.setItem('n', m.data.n)
-  },
-  delete() {},
-  get() {}
-}
+  }
+})
 
-// 视图相关的放到 V
-const v = {
+const view = {
   el: null,
   html: `
     <div>
@@ -42,26 +42,18 @@ const v = {
       </div>
     </div>
   `,
-  init(container) {
-    v.el = $(container)
-  },
   render(n) {
-    if (v.el.children.length !== 0) {
-      v.el.empty()
+    if (view.el.children.length !== 0) {
+      view.el.empty()
     }
-    $(v.html.replace('{{n}}', n)).appendTo(v.el)
-  }
-}
-
-// 其他放到 C
-const c = {
+    $(view.html.replace('{{n}}', n)).appendTo(view.el)
+  },
   init(container) {
-    // el 的作用是用户需要传入的容器
-    v.init(container)
-    v.render(m.data.n)
-    c.autoBindEvents()
+    view.el = $(container)
+    view.render(m.data.n)
+    view.autoBindEvents()
     eventBus.on('m:updated', () => {
-      v.render(m.data.n)
+      view.render(m.data.n)
     })
   },
   events: {
@@ -91,15 +83,15 @@ const c = {
     })
   },
   autoBindEvents() {
-    for (let key in c.events) {
-      const value = c.events[key]
+    for (let key in view.events) {
+      const value = view.events[key]
       const spaceIndex = key.indexOf(' ')
       const part1 = key.slice(0, spaceIndex)
       const part2 = key.slice(spaceIndex + 1)
-      v.el.on(part1, part2, c[value])
+      view.el.on(part1, part2, view[value])
     }
   }
 }
 // 初始化调用
-export default c
+export default view
 

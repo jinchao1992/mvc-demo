@@ -10931,7 +10931,91 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{"process":"sfur"}],"Rdxg":[function(require,module,exports) {
+},{"process":"sfur"}],"wYwp":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Model =
+/*#__PURE__*/
+function () {
+  function Model(options) {
+    var _this = this;
+
+    _classCallCheck(this, Model);
+
+    ['data', 'create', 'delete', 'update', 'get'].forEach(function (key) {
+      if (key in options) {
+        _this[key] = options[key];
+      }
+    });
+  }
+
+  _createClass(Model, [{
+    key: "create",
+    value: function create() {
+      console && console.log && console.error('你还没有创建create');
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      console && console.log && console.error('你还没有创建update');
+    }
+  }, {
+    key: "delete",
+    value: function _delete() {
+      console && console.log && console.error('你还没有创建delete');
+    }
+  }, {
+    key: "get",
+    value: function get() {
+      console && console.log && console.error('你还没有创建get');
+    }
+  }]);
+
+  return Model;
+}();
+
+var _default = Model;
+exports.default = _default;
+},{}],"SFHW":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var View = function View(_ref) {
+  var el = _ref.el,
+      html = _ref.html,
+      render = _ref.render;
+
+  _classCallCheck(this, View);
+
+  this.el = (0, _jquery.default)(el);
+  this.html = html;
+  this.render = render;
+};
+
+var _default = View;
+exports.default = _default;
+},{"jquery":"juYr"}],"Rdxg":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -10943,55 +11027,52 @@ require("./../css/app1.css");
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
+var _Model = _interopRequireDefault(require("../base/Model.js"));
+
+var _View = _interopRequireDefault(require("../base/View.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // 引入JQuery
-var eventBus = (0, _jquery.default)(window);
+
 /**
  * eventBus 
  * on 方法定义事件
  * trigger 触发事件
  */
+var eventBus = (0, _jquery.default)(window);
+/**
+ *  new Model 是方便把所有公共的属性放入到原先当中，因为 app1 中使用 app2 中也使用
+ */
 // 数据相关的放到 M
 
-var m = {
+var m = new _Model.default({
   data: {
     n: parseInt(localStorage.getItem('n'))
   },
-  create: function create() {},
   update: function update(data) {
     Object.assign(m.data, data); // 更新data里的数据
 
     eventBus.trigger('m:updated');
     localStorage.setItem('n', m.data.n);
-  },
-  delete: function _delete() {},
-  get: function get() {}
-}; // 视图相关的放到 V
-
-var v = {
+  }
+});
+var view = {
   el: null,
   html: "\n    <div>\n      <div class=\"output\">\n        <span id=\"number\">{{n}}</span>\n      </div>\n      <div class=\"actives\">\n        <button id=\"add\">+1</button>\n        <button id=\"subtract\">-1</button>\n        <button id=\"multiply\">*2</button>\n        <button id=\"divide\">\xF72</button>\n      </div>\n    </div>\n  ",
-  init: function init(container) {
-    v.el = (0, _jquery.default)(container);
-  },
   render: function render(n) {
-    if (v.el.children.length !== 0) {
-      v.el.empty();
+    if (view.el.children.length !== 0) {
+      view.el.empty();
     }
 
-    (0, _jquery.default)(v.html.replace('{{n}}', n)).appendTo(v.el);
-  }
-}; // 其他放到 C
-
-var c = {
+    (0, _jquery.default)(view.html.replace('{{n}}', n)).appendTo(view.el);
+  },
   init: function init(container) {
-    // el 的作用是用户需要传入的容器
-    v.init(container);
-    v.render(m.data.n);
-    c.autoBindEvents();
+    view.el = (0, _jquery.default)(container);
+    view.render(m.data.n);
+    view.autoBindEvents();
     eventBus.on('m:updated', function () {
-      v.render(m.data.n);
+      view.render(m.data.n);
     });
   },
   events: {
@@ -11021,19 +11102,19 @@ var c = {
     });
   },
   autoBindEvents: function autoBindEvents() {
-    for (var key in c.events) {
-      var value = c.events[key];
+    for (var key in view.events) {
+      var value = view.events[key];
       var spaceIndex = key.indexOf(' ');
       var part1 = key.slice(0, spaceIndex);
       var part2 = key.slice(spaceIndex + 1);
-      v.el.on(part1, part2, c[value]);
+      view.el.on(part1, part2, view[value]);
     }
   }
 }; // 初始化调用
 
-var _default = c;
+var _default = view;
 exports.default = _default;
-},{"./../css/app1.css":"AEyn","jquery":"juYr"}],"QsWc":[function(require,module,exports) {
+},{"./../css/app1.css":"AEyn","jquery":"juYr","../base/Model.js":"wYwp","../base/View.js":"SFHW"}],"QsWc":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -11045,51 +11126,43 @@ require("./../css/app2.css");
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
+var _Model = _interopRequireDefault(require("../base/Model"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var eventBus = (0, _jquery.default)(window);
 var localKey = 'app2.index'; // 数据层m
 
-var m = {
+var m = new _Model.default({
   data: {
     index: parseInt(localStorage.getItem(localKey)) || 0
   },
-  create: function create() {},
   update: function update(data) {
     Object.assign(m.data, data); // 更新data里的数据
 
     eventBus.trigger('m:updated');
     localStorage.setItem(localKey, m.data.index);
-  },
-  delete: function _delete() {},
-  get: function get() {}
-}; // 视图相关的放到 V
+  }
+}); // 其他放到 C
 
-var v = {
+var view = {
   el: null,
   html: function html(index) {
     return "\n      <div>\n        <ol class=\"tab-bar\">\n          <li class=\"".concat(index === 0 ? 'selected' : '', "\" data-index=\"0\">tab1</li>\n          <li class=\"").concat(index === 1 ? 'selected' : '', "\" data-index=\"1\">tab2</li>\n        </ol>\n        <ol class=\"tab-content\">\n          <li class=\"").concat(index === 0 ? 'active' : '', "\">\u5185\u5BB91</li>\n          <li class=\"").concat(index === 1 ? 'active' : '', "\">\u5185\u5BB92</li>\n        </ol>\n      </div>\n    ");
   },
-  init: function init(container) {
-    v.el = (0, _jquery.default)(container);
-  },
   render: function render(index) {
-    if (v.el.children.length !== 0) {
-      v.el.empty();
+    if (view.el.children.length !== 0) {
+      view.el.empty();
     }
 
-    (0, _jquery.default)(v.html(index)).appendTo(v.el);
-  }
-}; // 其他放到 C
-
-var c = {
+    (0, _jquery.default)(view.html(index)).appendTo(view.el);
+  },
   init: function init(container) {
-    // el 的作用是用户需要传入的容器
-    v.init(container);
-    v.render(m.data.index);
-    c.autoBindEvents();
+    view.el = (0, _jquery.default)(container);
+    view.render(m.data.index);
+    view.autoBindEvents();
     eventBus.on('m:updated', function () {
-      v.render(m.data.index);
+      view.render(m.data.index);
     });
   },
   events: {
@@ -11102,18 +11175,18 @@ var c = {
     });
   },
   autoBindEvents: function autoBindEvents() {
-    for (var key in c.events) {
-      var value = c.events[key];
+    for (var key in view.events) {
+      var value = view.events[key];
       var spaceIndex = key.indexOf(' ');
       var part1 = key.slice(0, spaceIndex);
       var part2 = key.slice(spaceIndex + 1);
-      v.el.on(part1, part2, c[value]);
+      view.el.on(part1, part2, view[value]);
     }
   }
 };
-var _default = c;
+var _default = view;
 exports.default = _default;
-},{"./../css/app2.css":"AEyn","jquery":"juYr"}],"CHY8":[function(require,module,exports) {
+},{"./../css/app2.css":"AEyn","jquery":"juYr","../base/Model":"wYwp"}],"CHY8":[function(require,module,exports) {
 "use strict";
 
 require("./../css/app3.css");
@@ -11177,4 +11250,4 @@ _app.default.init('#app1');
 
 _app2.default.init('#app2');
 },{"./css/reset.css":"AEyn","./css/global.css":"AEyn","./js/app1":"Rdxg","./js/app2":"QsWc","./js/app3":"CHY8","./js/app4":"qLTF"}]},{},["epB2"], null)
-//# sourceMappingURL=main.e2b351f4.js.map
+//# sourceMappingURL=main.fa4b2e30.js.map

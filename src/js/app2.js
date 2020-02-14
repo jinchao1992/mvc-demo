@@ -1,29 +1,27 @@
 import './../css/app2.css'
 
 import $ from 'jquery'
+import Model from '../base/Model'
 
 const eventBus = $(window)
 
 const localKey = 'app2.index'
 
 // 数据层m
-const m = {
+const m = new Model({
   data: {
     index: parseInt(localStorage.getItem(localKey)) || 0
   },
-  create() {},
   update(data) {
     Object.assign(m.data, data)
     // 更新data里的数据
     eventBus.trigger('m:updated')
     localStorage.setItem(localKey, m.data.index)
-  },
-  delete() {},
-  get() {}
-}
+  }
+})
 
-// 视图相关的放到 V
-const v = {
+// 其他放到 C
+const view = {
   el: null,
   html: (index) => { 
     return `
@@ -39,26 +37,18 @@ const v = {
       </div>
     `
   },
-  init(container) {
-    v.el = $(container)
-  },
   render(index) {
-    if (v.el.children.length !== 0) {
-      v.el.empty()
+    if (view.el.children.length !== 0) {
+      view.el.empty()
     }
-    $(v.html(index)).appendTo(v.el)
-  }
-}
-
-// 其他放到 C
-const c = {
+    $(view.html(index)).appendTo(view.el)
+  },
   init(container) {
-    // el 的作用是用户需要传入的容器
-    v.init(container)
-    v.render(m.data.index)
-    c.autoBindEvents()
+    view.el = $(container)
+    view.render(m.data.index)
+    view.autoBindEvents()
     eventBus.on('m:updated', () => {
-      v.render(m.data.index)
+      view.render(m.data.index)
     })
   },
   events: {
@@ -71,14 +61,14 @@ const c = {
     })
   },
   autoBindEvents() {
-    for (let key in c.events) {
-      const value = c.events[key]
+    for (let key in view.events) {
+      const value = view.events[key]
       const spaceIndex = key.indexOf(' ')
       const part1 = key.slice(0, spaceIndex)
       const part2 = key.slice(spaceIndex + 1)
-      v.el.on(part1, part2, c[value])
+      view.el.on(part1, part2, view[value])
     }
   }
 }
 
-export default c
+export default view
